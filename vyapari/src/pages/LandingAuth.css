@@ -1,0 +1,425 @@
+/* Vyapari design tokens
+   Colors: ivory #F6F4EC, deep forest #1B3A2B, market green #3F7A5E,
+           mustard accent #D9A441, ink #1B211D
+   Type: 'Fraunces' (display, market signage feel) + 'Work Sans' (body/utility)
+   Signature: stall awnings that roll open on hover to reveal login/signup
+*/
+
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,500&family=Work+Sans:wght@400;500;600&display=swap");
+
+.landing {
+  --ivory: #f6f4ec;
+  --forest: #1b3a2b;
+  --market-green: #3f7a5e;
+  --mustard: #d9a441;
+  --ink: #1b211d;
+  font-family: "Work Sans", sans-serif;
+  color: var(--ink);
+  background: var(--ivory);
+}
+
+/* ---------- Hero ---------- */
+.landing__hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  background: linear-gradient(180deg, var(--forest) 0%, #234a35 100%);
+  color: var(--ivory);
+  overflow: hidden;
+  padding: 0 6vw;
+  gap: 2rem;
+}
+
+.landing__hero-content {
+  text-align: left;
+  flex: 1;
+  z-index: 1;
+  padding-left: 6vw
+}
+
+.landing__hero-image {
+  max-width: 52%;
+  height: auto;
+  max-height: 85vh;
+  object-fit: contain;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.35));
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .landing__hero {
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem 6vw;
+  }
+  .landing__hero-content {
+    text-align: center;
+  }
+  .landing__hero-image {
+    max-width: 70%;
+    order: -1;
+  }
+}
+
+.landing__hero-leaf {
+  position: absolute;
+  inset: -20% -20% auto -20%;
+  height: 140%;
+  background: radial-gradient(
+    circle at 30% 20%,
+    rgba(217, 164, 65, 0.18),
+    transparent 55%
+  );
+  animation: driftLeaf 12s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes driftLeaf {
+  from {
+    transform: translate(-2%, -1%) scale(1);
+  }
+  to {
+    transform: translate(2%, 3%) scale(1.05);
+  }
+}
+
+.landing__store-name {
+  font-family: "Fraunces", serif;
+  font-weight: 700;
+  font-style: italic;
+  font-size: clamp(9rem, 9vw, 6rem);
+  margin: 0;
+  letter-spacing: -0.01em;
+  opacity: 0;
+  transform: translateY(16px);
+  animation: riseIn 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s forwards;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    text-shadow 0.3s ease;
+  display: inline-block;
+  cursor: default;
+}
+
+.landing__store-name:hover {
+  transform: translateY(-6px) scale(1.03);
+  text-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+.landing__tagline {
+  font-size: clamp(2rem, 2vw, 1.25rem);
+  color: #d8e4dc;
+  margin-top: 0.75rem;
+  opacity: 0;
+  transform: translateY(12px);
+  animation: riseIn 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.4s forwards;
+}
+
+@keyframes riseIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.landing__scroll-cue {
+  position: absolute;
+  bottom: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.landing__scroll-cue span {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--mustard);
+  opacity: 0.3;
+  animation: pulseDot 1.6s ease-in-out infinite;
+}
+.landing__scroll-cue span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.landing__scroll-cue span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+@keyframes pulseDot {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+/* ---------- Auth section ---------- */
+.landing__auth {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2.5rem;
+  padding: 6rem 8vw;
+  align-items: start;
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.landing__auth.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---------- Stall card (the signature hover element) ---------- */
+.stall {
+  position: relative;
+  border-radius: 6px 6px 2px 2px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 1px 0 rgba(27, 33, 29, 0.06);
+  border: 1px solid rgba(27, 33, 29, 0.08);
+}
+
+.stall--customer .stall__awning {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--market-green) 0 32px,
+    #4d8f6d 32px 64px
+  );
+}
+.stall--seller .stall__awning {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--mustard) 0 32px,
+    #e3b563 32px 64px
+  );
+}
+
+.stall__awning {
+  height: 220px;
+  display: flex;
+  align-items: flex-end;
+  padding: 1.25rem 1.5rem;
+  transform-origin: top;
+  transition: height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 92%,
+    92% 100%,
+    84% 92%,
+    76% 100%,
+    68% 92%,
+    60% 100%,
+    52% 92%,
+    44% 100%,
+    36% 92%,
+    28% 100%,
+    20% 92%,
+    12% 100%,
+    4% 92%,
+    0 100%
+  );
+}
+
+.stall__awning-label {
+  font-family: "Fraunces", serif;
+  font-weight: 600;
+  color: var(--forest);
+  background: rgba(255, 255, 255, 0.85);
+  padding: 0.3rem 0.7rem;
+  border-radius: 3px;
+  font-size: 0.95rem;
+}
+
+.stall__interior {
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transform: translateY(-8px);
+  opacity: 0.85;
+  transition: transform 0.45s ease, opacity 0.45s ease;
+}
+
+.stall:hover .stall__awning,
+.stall:focus-within .stall__awning {
+  height: 64px;
+  transform: scaleY(0.9);
+}
+
+.stall:hover .stall__interior,
+.stall:focus-within .stall__interior {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.stall__title {
+  font-family: "Fraunces", serif;
+  font-size: 1.5rem;
+  margin: 0;
+  color: var(--ink);
+}
+
+.stall__toggle {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.stall__toggle button {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid rgba(27, 33, 29, 0.15);
+  background: transparent;
+  border-radius: 4px;
+  font-family: "Work Sans", sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--ink);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.stall__toggle button.is-active {
+  background: var(--forest);
+  color: var(--ivory);
+  border-color: var(--forest);
+}
+
+.stall__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.stall__form label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.85rem;
+  font-weight: 500;
+  gap: 0.3rem;
+}
+
+.stall__form input {
+  padding: 0.6rem 0.7rem;
+  border: 1px solid rgba(27, 33, 29, 0.2);
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: "Work Sans", sans-serif;
+}
+
+.stall__form input:focus-visible {
+  outline: 2px solid var(--market-green);
+  outline-offset: 1px;
+}
+
+.stall__error {
+  color: #b3402c;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.stall__submit {
+  margin-top: 0.25rem;
+  padding: 0.65rem;
+  border: none;
+  border-radius: 4px;
+  background: var(--forest);
+  color: var(--ivory);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.stall__submit:hover {
+  background: var(--market-green);
+}
+
+.stall__submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .landing__hero-leaf,
+  .landing__store-name,
+  .landing__tagline,
+  .landing__scroll-cue span,
+  .landing__auth,
+  .stall__awning,
+  .stall__interior {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    .contact-card {
+    transition: none !important;
+    transform: none !important;
+  }
+  }
+  /* ---------- Contact section ---------- */
+.landing__contact {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 8vw;
+  background: var(--ivory);
+  text-align: center;
+}
+
+.landing__contact-title {
+  font-family: "Fraunces", serif;
+  font-weight: 600;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  margin-bottom: 2.5rem;
+  color: var(--forest);
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 900px;
+}
+
+.contact-card {
+  background: #fff;
+  border: 1px solid rgba(27, 33, 29, 0.08);
+  border-radius: 8px;
+  padding: 2rem 1.5rem;
+  box-shadow: 0 2px 6px rgba(27, 33, 29, 0.06);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s ease;
+}
+
+.contact-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(27, 33, 29, 0.15);
+}
+
+.contact-card__label {
+  display: block;
+  font-family: "Fraunces", serif;
+  font-weight: 600;
+  color: var(--market-green);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.contact-card p {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+}
