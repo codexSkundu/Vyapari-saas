@@ -175,7 +175,7 @@ export default function LandingAuth() {
           </div>
           <div className="contact-card">
             <span className="contact-card__label">Find us</span>
-            <p>Durgapur, West Bengal</p>
+            <p>aapke pink bra k andar</p>
           </div>
         </div>
       </section>

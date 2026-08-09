@@ -363,7 +363,9 @@
     transform: none !important;
   }
   }
-  /* ---------- Contact section ---------- */
+  
+}
+/* ---------- Contact section ---------- */
 .landing__contact {
   min-height: 60vh;
   display: flex;
@@ -421,5 +423,4 @@
   margin: 0;
   font-size: 1.05rem;
   color: var(--ink);
-}
 }
