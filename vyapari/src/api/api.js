@@ -52,4 +52,16 @@ export const api = {
     }),
 
   getDeliveryUsers: () => request("/delivery-users"),
+
+  addDeliveryUser: (user) =>
+    request("/delivery-users", { method: "POST", body: JSON.stringify(user) }),
+
+  updateDeliveryUserStatus: (userId, status) =>
+    request(`/delivery-users/${userId}`, {
+      method: "PUT",
+      body: JSON.stringify({ status }),
+    }),
+
+  deleteDeliveryUser: (userId) =>
+    request(`/delivery-users/${userId}`, { method: "DELETE" }),
 };

@@ -17,17 +17,25 @@ function AuthStall({ role, mode, setMode, onSuccess }) {
     e.preventDefault();
     setError("");
     setLoading(true);
-    try {
-      const result =
-        mode === "login"
-          ? await api.login(email, password, role)
-          : await api.signup(email, password, role);
-      onSuccess(result, role);
-    } catch (err) {
-      setError(err.message || "Something went wrong. Try again.");
-    } finally {
+
+    // TEMPORARY MOCK — remove once the real backend is ready
+    setTimeout(() => {
+      onSuccess({ role, token: "mock-token" }, role);
       setLoading(false);
-    }
+    }, 300);
+
+    // Real version (restore this once backend is live):
+    // try {
+    //   const result =
+    //     mode === "login"
+    //       ? await api.login(email, password, role)
+    //       : await api.signup(email, password, role);
+    //   onSuccess(result, role);
+    // } catch (err) {
+    //   setError(err.message || "Something went wrong. Try again.");
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   return (
