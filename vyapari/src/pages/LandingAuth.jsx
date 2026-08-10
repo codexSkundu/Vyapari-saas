@@ -1,11 +1,27 @@
-import { useEffect, useRef, useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { api } from "../api/api";
 import "./LandingAuth.css";
 import veggiesImg from "../assets/veggies.png";
 
 const STORE_NAME = "Vyapari";
 const TAGLINE = "Fresh from the seller's stall to your door.";
+
+const GROCERY_ITEMS = ["🥕", "🍅", "🧅", "🥔", "🥬", "🌶️", "🍎", "🥭", "🥒", "🌽"];
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0 },
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.18 },
+  },
+};
 
 function AuthStall({ role, mode, setMode, onSuccess }) {
   const [email, setEmail] = useState("");
@@ -39,7 +55,11 @@ function AuthStall({ role, mode, setMode, onSuccess }) {
   };
 
   return (
-    <div className={`stall stall--${role}`}>
+    <motion.div
+      className={`stall stall--${role}`}
+      variants={fadeUp}
+      whileHover={{ y: -6, transition: { duration: 0.25 } }}
+    >
       <div className="stall__awning" aria-hidden="true">
         <span className="stall__awning-label">
           {role === "seller" ? "Seller entrance" : "Customer entrance"}
@@ -52,20 +72,22 @@ function AuthStall({ role, mode, setMode, onSuccess }) {
         </h3>
 
         <div className="stall__toggle">
-          <button
+          <motion.button
             type="button"
             className={mode === "login" ? "is-active" : ""}
             onClick={() => setMode("login")}
+            whileTap={{ scale: 0.95 }}
           >
             Log in
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="button"
             className={mode === "signup" ? "is-active" : ""}
             onClick={() => setMode("signup")}
+            whileTap={{ scale: 0.95 }}
           >
             Sign up
-          </button>
+          </motion.button>
         </div>
 
         <form onSubmit={handleSubmit} className="stall__form">
@@ -79,6 +101,7 @@ function AuthStall({ role, mode, setMode, onSuccess }) {
               autoComplete="email"
             />
           </label>
+
           <label>
             Password
             <input
@@ -91,46 +114,68 @@ function AuthStall({ role, mode, setMode, onSuccess }) {
             />
           </label>
 
-          {error && <p className="stall__error">{error}</p>}
+          {error && (
+            <motion.p
+              className="stall__error"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              {error}
+            </motion.p>
+          )}
 
-          <button type="submit" className="stall__submit" disabled={loading}>
+          <motion.button
+            type="submit"
+            className="stall__submit"
+            disabled={loading}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          >
             {loading
               ? "One moment…"
               : mode === "login"
               ? "Log in"
               : `Sign up as ${role}`}
-          </button>
+          </motion.button>
         </form>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 export default function LandingAuth() {
   const navigate = useNavigate();
-  const revealRef = useRef(null);
-  const [revealed, setRevealed] = useState(false);
+  const authRef = useRef(null);
+
   const [customerMode, setCustomerMode] = useState("login");
   const [sellerMode, setSellerMode] = useState("login");
+  const [introPhase, setIntroPhase] = useState("items");
 
   useEffect(() => {
-    const node = revealRef.current;
-    if (!node) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setRevealed(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.2 }
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
+    // Phase 1: grocery circle (1 second)
+    const timer1 = setTimeout(() => {
+      setIntroPhase("logo");
+    }, 1000);
+
+    // Phase 2: Vyapari + tagline (1 second total)
+    const timer2 = setTimeout(() => {
+      setIntroPhase("done");
+    }, 2000);
+
+    // Phase 3: scroll to auth
+    const timer3 = setTimeout(() => {
+      authRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 2100);
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+    };
   }, []);
 
   const handleAuthSuccess = (result, role) => {
-    // Expecting backend to return { role, token } (or similar) on success.
     const resolvedRole = result?.role || role;
     localStorage.setItem("vyapari_role", resolvedRole);
     if (result?.token) localStorage.setItem("vyapari_token", result.token);
@@ -139,23 +184,95 @@ export default function LandingAuth() {
 
   return (
     <div className="landing">
-      <section className="landing__hero">
-        <div className="landing__hero-leaf" aria-hidden="true" />
-        <div className="landing__hero-content">
-          <h1 className="landing__store-name">{STORE_NAME}</h1>
-          <p className="landing__tagline">{TAGLINE}</p>
-        </div>
-        <img src={veggiesImg} alt="Fresh vegetables" className="landing__hero-image" />
-        <div className="landing__scroll-cue">
-          <span />
-          <span />
-          <span />
-        </div>
-      </section>
+      {/* ===== INTRO OVERLAY ===== */}
+      <AnimatePresence>
+        {introPhase !== "done" && (
+          <motion.div
+            className="intro-overlay"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            {/* Grocery items rotating in a circle */}
+            {introPhase === "items" && (
+              <motion.div
+                className="intro-circle"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, ease: "linear" }}
+              >
+                {GROCERY_ITEMS.map((item, index) => {
+                  const angle = (index / GROCERY_ITEMS.length) * 360;
+                  return (
+                    <span
+                      key={index}
+                      className="intro-item"
+                      style={{
+                        transform: `rotate(${angle}deg) translate(100px) rotate(-${angle}deg)`,
+                      }}
+                    >
+                      {item}
+                    </span>
+                  );
+                })}
+              </motion.div>
+            )}
 
-      <section
-        ref={revealRef}
-        className={`landing__auth ${revealed ? "is-revealed" : ""}`}
+            {/* Big Vyapari + Tagline */}
+            {introPhase === "logo" && (
+              <div className="intro-text">
+                <motion.h1
+                  className="intro-logo"
+                  initial={{ opacity: 0, scale: 0.4 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 1.15 }}
+                  transition={{ type: "spring", stiffness: 220, damping: 16 }}
+                >
+                  {STORE_NAME}
+                </motion.h1>
+
+                <motion.p
+                  className="intro-tagline"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{
+                    delay: 0.5,
+                    type: "spring",
+                    stiffness: 200,
+                    damping: 18,
+                  }}
+                >
+                  {TAGLINE}
+                </motion.p>
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ===== THIN TOP BANNER ===== */}
+      {introPhase === "done" && (
+        <motion.header
+          className="landing__top-banner"
+          initial={{ y: -80, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+        >
+          <div className="landing__top-banner-content">
+            <h1 className="landing__top-banner-name">{STORE_NAME}</h1>
+            <p className="landing__top-banner-tagline">{TAGLINE}</p>
+          </div>
+        </motion.header>
+      )}
+
+      {/* ===== AUTH STALLS ===== */}
+      <motion.section
+        ref={authRef}
+        className="landing__auth"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.25 }}
+        variants={staggerContainer}
       >
         <AuthStall
           role="customer"
@@ -169,22 +286,45 @@ export default function LandingAuth() {
           setMode={setSellerMode}
           onSuccess={handleAuthSuccess}
         />
-      </section>
+      </motion.section>
+
+      {/* ===== CONTACT ===== */}
       <section className="landing__contact">
-        <h2 className="landing__contact-title">Get in touch</h2>
-        <div className="contact-grid">
-          <div className="contact-card">
-            <span className="contact-card__label">Email</span>
-            <p>hello@vyapari.com</p>
-          </div>
-          <div className="contact-card">
-            <span className="contact-card__label">Phone</span>
-            <p>+91 00000 00000</p>
-          </div>
-          <div className="contact-card">
-            <span className="contact-card__label">Find us</span>
-            <p>aapke pink bra k andar</p>
-          </div>
+        <motion.h2
+          className="landing__contact-title"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          Get in touch
+        </motion.h2>
+
+        <div className="contact-with-cat">
+          <motion.div
+            className="contact-grid"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={staggerContainer}
+          >
+            <motion.div className="contact-card" variants={fadeUp}>
+              <span className="contact-card__label">Email</span>
+              <p>hello@vyapari.com</p>
+            </motion.div>
+
+            <motion.div className="contact-card" variants={fadeUp}>
+              <span className="contact-card__label">Phone</span>
+              <p>+91 00000 00000</p>
+            </motion.div>
+
+            <motion.div className="contact-card" variants={fadeUp}>
+              <span className="contact-card__label">Find us</span>
+              <p>WEST BENGAL</p>
+            </motion.div>
+          </motion.div>
+
+          
         </div>
       </section>
     </div>
