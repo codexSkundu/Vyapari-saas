@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { api } from "../api/api";
 import "./LandingAuth.css";
-import veggiesImg from "../assets/veggies.png";
+
 
 const STORE_NAME = "Vyapari";
 const TAGLINE = "Fresh from the seller's stall to your door.";

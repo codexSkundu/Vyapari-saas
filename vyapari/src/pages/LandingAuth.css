@@ -212,23 +212,15 @@
 
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .landing__hero-leaf,
-  .landing__store-name,
-  .landing__tagline,
-  .landing__scroll-cue span,
   .landing__auth,
   .stall__awning,
-  .stall__interior {
+  .stall__interior,
+  .contact-card {
     animation: none !important;
     transition: none !important;
     opacity: 1 !important;
     transform: none !important;
-    .contact-card {
-    transition: none !important;
-    transform: none !important;
   }
-  }
-  
 }
 /* ---------- Contact section ---------- */
 .landing__contact {
