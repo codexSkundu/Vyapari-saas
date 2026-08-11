@@ -47,23 +47,34 @@ export default function DeliveryPersonnelList() {
       const { orderId, ...personnelData } = form;
       const created = await api.addDeliveryUser({ ...personnelData, status: "AVAILABLE" });
 
-      if (orderId && created?.id) {
-        await api.reassignOrder(Number(orderId), created.id);
+      // if (orderId && created?.id) {
+      //   await api.reassignOrder(Number(orderId), created.id);
+      // }
+    // Send orderId cleanly as a String
+      if (orderId && orderId.trim() !== "" && created?.id) {
+        await api.reassignOrder(orderId, created.id); 
       }
 
+      loadUsers();
       setForm(EMPTY_FORM);
       setShowForm(false);
       loadUsers();
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Failed to add delivery personnel.");
     }
   };
 
   const handleToggleStatus = async (user) => {
-    const nextStatus = user.status === "AVAILABLE" ? "BUSY" : "AVAILABLE";
+    const currentStatus = String(user.status).toUpperCase().trim();
+    const nextStatus = currentStatus === "AVAILABLE" ? "BUSY" : "AVAILABLE";
     try {
-      await api.updateDeliveryUserStatus(user.id, nextStatus);
-      loadUsers();
+      // await api.updateDeliveryUserStatus(user.id, nextStatus);
+      // await loadUsers();  // Refresh the list instantly to show the new badge
+       // 2. Pass ID and explicit text as clear, separated arguments
+    await api.updateDeliveryUserStatus(user.id, nextStatus);
+    
+    // 3. Trigger a complete, hard fetch to pull down the newly saved data
+    await loadUsers();
     } catch (err) {
       setError(err.message);
     }
@@ -74,7 +85,7 @@ export default function DeliveryPersonnelList() {
       await api.deleteDeliveryUser(userId);
       loadUsers();
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Failed to update status");
     }
   };
 
@@ -184,6 +195,7 @@ export default function DeliveryPersonnelList() {
               <th>Bike ID</th>
               <th>Phone</th>
               <th>Verification ID</th>
+              <th>ORDER ID</th>
               <th>Status</th>
               <th></th>
             </tr>
@@ -214,6 +226,38 @@ export default function DeliveryPersonnelList() {
                 <td>{u.bikeId || "—"}</td>
                 <td>{u.phoneNumber || "—"}</td>
                 <td>{u.verificationId ? maskId(u.verificationId) : "—"}</td>
+
+                <td>
+                  {u.orderId ? (
+                    // If an order ID is already assigned, display it clearly
+                    <span style={{ fontWeight: "bold", color: "#157347" }}>{u.orderId}</span>
+                  ) : (
+                    // If no order ID is filled, show a button to link one on demand later
+                    <button 
+                      style={{ padding: "4px 8px", fontSize: "12px", background: "#f8f9fa", border: "1px solid #ced4da", borderRadius: "4px", cursor: "pointer" }}
+                      onClick={async () => {
+                        const typedOrderId = prompt(`Enter Order ID to assign to ${u.name}:`);
+                        if (typedOrderId && typedOrderId.trim() !== "") {
+                          try {
+                            // Sends update down your network api bridge configuration layers
+                            await api.reassignOrder(typedOrderId, u.id);
+                            alert(`Successfully linked Order #${typedOrderId} to ${u.name}!`);
+
+                            // Re-fetches fresh entries from MySQL to instantly update the UI text rows
+                            loadUsers(); 
+                          } catch (err) {
+                            alert("Could not assign order parameter: " + err.message);
+                          }
+                        }
+                      }}
+                    >
+                      + Link Order
+                    </button>
+                  )}
+                </td>
+
+
+
                 <td>
                   <button
                     className={`badge ${u.status === "AVAILABLE" ? "badge--available" : "badge--busy"}`}

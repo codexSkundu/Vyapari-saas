@@ -48,7 +48,7 @@ export default function ItemsList() {
         name: newItem.name,
         stock: Number(newItem.stock),
         price: Number(newItem.price),
-        imageData: newItem.imageData,
+        imageUrl: newItem.imageData,
         category: activeCategory,
       });
       setNewItem({ name: "", stock: "", price: "", imageData: "" });
