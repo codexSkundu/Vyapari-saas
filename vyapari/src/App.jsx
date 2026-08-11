@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LandingAuth from "./pages/LandingAuth";
 import SellerDashboard from "./pages/SellerDashboard";
-// import CustomerDashboard from "./pages/CustomerDashboard"; // build this next
+import CustomerDashboard from "./pages/CustomerDashboard";
 
 export default function App() {
   return (
@@ -9,7 +9,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<LandingAuth />} />
         <Route path="/dashboard/seller" element={<SellerDashboard />} />
-        {/* <Route path="/dashboard/customer" element={<CustomerDashboard />} /> */}
+        <Route path="/dashboard/customer" element={<CustomerDashboard />} />
       </Routes>
     </BrowserRouter>
   );
