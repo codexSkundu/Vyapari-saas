@@ -56,26 +56,24 @@ public class DeliveryPersonnelController {
 
 // This endpoint runs when you link an Order ID to an existing driver later
     @PutMapping("/{id}/reassign")
-    public ResponseEntity<DeliveryPersonnel> assignOrder(
-            @PathVariable Long id, 
-            @RequestBody java.util.Map<String, String> body) {
-                
-        
-        return deliveryPersonnelRepository.findById(id).map(personnel -> {
-            String targetOrderId = body != null ? body.get("orderId") : null;
-            
-            if (targetOrderId != null && !targetOrderId.trim().isEmpty()) {
-                personnel.setOrderId(targetOrderId.trim());
-                personnel.setStatus("BUSY"); // Automatically switch status to busy when assigned a delivery job
-            } else {
-                personnel.setOrderId(null);
-                personnel.setStatus("AVAILABLE"); // Frees the driver if order ID is wiped clear
-            }
-            
-            DeliveryPersonnel updated = deliveryPersonnelRepository.save(personnel);
-            return ResponseEntity.ok(updated);
-        }).orElse(ResponseEntity.notFound().build());
-    }
+public ResponseEntity<DeliveryPersonnel> assignOrder(
+        @PathVariable Long id,
+        @RequestParam(name = "orderId") String targetOrderId) { // Changed from @RequestBody to @RequestParam
+
+    return deliveryPersonnelRepository.findById(id).map(personnel -> {
+        if (targetOrderId != null && !targetOrderId.trim().isEmpty()) {
+            personnel.setOrderId(targetOrderId.trim());
+            personnel.setStatus("BUSY");
+        } else {
+            personnel.setOrderId(null);
+            personnel.setStatus("AVAILABLE");
+        }
+
+        DeliveryPersonnel updated = deliveryPersonnelRepository.save(personnel);
+        return ResponseEntity.ok(updated);
+    }).orElse(ResponseEntity.notFound().build());
+}
+
 
 
     @DeleteMapping("/{id}")

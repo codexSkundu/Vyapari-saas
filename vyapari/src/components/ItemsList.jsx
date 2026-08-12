@@ -176,9 +176,6 @@ export default function ItemsList() {
 
       <div className="panel">
         <h2>Your {activeCategoryLabel} stock</h2>
-        <p style={{ marginTop: "-0.5rem", color: "rgba(27,33,29,0.55)", fontSize: "0.85rem" }}>
-          {categoryItems.length} item{categoryItems.length !== 1 ? "s" : ""} listed in this category
-        </p>
 
         {loading ? (
           <p>Loading items…</p>

@@ -47,10 +47,19 @@ export const api = {
 
 
 //new code
-    reassignOrder: (orderId, deliveryUserId) =>
-    request(`/delivery-personnel/${deliveryUserId}/reassign?orderId=${orderId}`, {
+      
+   reassignOrder: (orderId, deliveryUserId) => 
+  request(`/delivery-personnel/${deliveryUserId}/reassign?orderId=${orderId}`, {
+    method: "PUT",
+  }),
+
+    reassignOrderDriver: (orderId, driverName) => 
+    request(`/orders/${orderId}/reassign-driver?driverName=${encodeURIComponent(driverName)}`, {
       method: "PUT",
     }),
+
+
+
 
   getDeliveryUsers: async () => {
     // 1. Fetches data from your clean /delivery-personnel java endpoint

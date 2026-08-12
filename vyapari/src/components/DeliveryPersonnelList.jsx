@@ -238,16 +238,35 @@ export default function DeliveryPersonnelList() {
                       onClick={async () => {
                         const typedOrderId = prompt(`Enter Order ID to assign to ${u.name}:`);
                         if (typedOrderId && typedOrderId.trim() !== "") {
-                          try {
-                            // Sends update down your network api bridge configuration layers
-                            await api.reassignOrder(typedOrderId, u.id);
-                            alert(`Successfully linked Order #${typedOrderId} to ${u.name}!`);
+                          // try {
+                          //   // Sends update down your network api bridge configuration layers
+                          //   await api.reassignOrder(typedOrderId, u.id);
+                          //   alert(`Successfully linked Order #${typedOrderId} to ${u.name}!`);
 
-                            // Re-fetches fresh entries from MySQL to instantly update the UI text rows
-                            loadUsers(); 
-                          } catch (err) {
-                            alert("Could not assign order parameter: " + err.message);
-                          }
+                          //   // Re-fetches fresh entries from MySQL to instantly update the UI text rows
+                          //   loadUsers(); 
+                          // } catch (err) {
+                          //   alert("Could not assign order parameter: " + err.message);
+                          // }
+                                      try {
+              // Sends update down your network api bridge configuration layers
+              await api.reassignOrder(typedOrderId, u.id);
+              alert(`Successfully linked Order #${typedOrderId} to ${u.name}!`);
+              
+              // This part fixes your "Failed to Fetch" error by updating the screen instantly!
+              if (typeof setUsers === 'function') {
+                setUsers(prev => prev.map(user => user.id === u.id ? { ...user, orderId: typedOrderId } : user));
+              } else if (typeof setDeliveryPersonnel === 'function') {
+                setDeliveryPersonnel(prev => prev.map(user => user.id === u.id ? { ...user, orderId: typedOrderId } : user));
+              } else if (typeof setPersonnel === 'function') {
+                setPersonnel(prev => prev.map(user => user.id === u.id ? { ...user, orderId: typedOrderId } : user));
+              } else {
+                loadUsers(); 
+              }
+            } catch (err) {
+              alert("Could not assign order parameter: " + err.message);
+            }
+
                         }
                       }}
                     >

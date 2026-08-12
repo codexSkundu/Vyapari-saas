@@ -27,14 +27,42 @@ export default function OrdersTable() {
 
   useEffect(load, []);
 
-  const handleReassign = async (orderId, deliveryUserId) => {
+  // const handleReassign = async (orderId, deliveryUserId) => {
+  //   try {
+  //     await api.reassignOrder(orderId, Number(deliveryUserId));
+  //     load();
+  //   } catch (err) {
+  //     setError(err.message);
+  //   }
+  // };
+
+    const handleReassign = async (orderId, deliveryUserId) => {
+    if (!deliveryUserId) return;
+    
+    // 1. Get the actual string name of the driver from the state array
+    const targetDriver = deliveryUsers.find(user => String(user.id) === String(deliveryUserId));
+    if (!targetDriver) return;
+
     try {
-      await api.reassignOrder(orderId, Number(deliveryUserId));
-      load();
+      setError("");
+      
+      // 2. Fire the network request to save to your MySQL database
+      await api.reassignOrderDriver(orderId, targetDriver.name);
+      
+      // 3. Update the UI state directly in memory to avoid backend mapping mismatches
+      setOrders(prevOrders => 
+        prevOrders.map(order => 
+          order.id === orderId 
+            ? { ...order, assigned_to_name: targetDriver.name, assignedToName: targetDriver.name, status: "IN_TRANSIT" } 
+            : order
+        )
+      );
+
     } catch (err) {
-      setError(err.message);
+      setError("Could not update dropdown assignment: " + err.message);
     }
   };
+
 
   return (
     <div className="panel">
@@ -59,34 +87,43 @@ export default function OrdersTable() {
             {orders.map((order) => (
               <tr key={order.id}>
                 <td>
-                  {order.items
+                  {/* {order.items_summary
                     ?.map((i) => `${i.name} ×${i.quantity}`)
-                    .join(", ")}
+                    .join(", ")
+                    } */}
+                    {order.itemsSummary || "No items"}
                 </td>
                 <td>
                   <span className={`badge ${STATUS_CLASS[order.status] || ""}`}>
                     {order.status}
                   </span>
                 </td>
-                <td>{order.assignedToName || "Unassigned"}</td>
-                <td>{order.dropAddress}</td>
-                <td>
-                  <select
-                    defaultValue=""
-                    onChange={(e) => {
-                      if (e.target.value) handleReassign(order.id, e.target.value);
-                    }}
-                  >
-                    <option value="" disabled>
-                      Reassign…
-                    </option>
-                    {deliveryUsers.map((u) => (
-                      <option key={u.id} value={u.id}>
-                        {u.name} ({u.status})
-                      </option>
-                    ))}
-                  </select>
-                </td>
+               
+
+
+          {/* <td>{order.assigned_to_name || "Unassigned"}</td> */}
+
+                    {/* Replace line 73 with this line to catch both naming variants safely */}
+          <td>{order.assigned_to_name || order.assignedToName || "Unassigned"}</td>
+
+
+          <td>{order.dropAddress}</td>
+          <td>
+            <select 
+              defaultValue=""
+              onChange={(e) => handleReassign(order.id, e.target.value)}
+            >
+              <option value="" disabled>
+                Reassign...
+              </option>
+              {deliveryUsers.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.name} ({u.status})
+                </option>
+              ))}
+            </select>
+          </td>
+
               </tr>
             ))}
           </tbody>
