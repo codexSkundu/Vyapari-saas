@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../api/api";
+import { CATEGORIES } from "../data/categories";
 import "./CustomerDashboard.css";
 
 const STATUS_CLASS = {
@@ -60,10 +61,10 @@ const TAB_TITLES = {
 };
 
 const FALLBACK_ITEMS = [
-  { id: 1, name: "Tomatoes", price: 42, stock: 12, imageUrl: "", category: "fresh" },
-  { id: 2, name: "Leafy greens", price: 56, stock: 8, imageUrl: "", category: "fresh" },
-  { id: 3, name: "Carrots", price: 28, stock: 14, imageUrl: "", category: "fresh" },
-  { id: 4, name: "Onions", price: 30, stock: 9, imageUrl: "", category: "fresh" },
+  { id: 1, name: "Tomatoes", price: 42, stock: 12, imageUrl: "", category: "fruits" },
+  { id: 2, name: "Leafy greens", price: 56, stock: 8, imageUrl: "", category: "vegetables" },
+  { id: 3, name: "Carrots", price: 28, stock: 14, imageUrl: "", category: "vegetables" },
+  { id: 4, name: "Onions", price: 30, stock: 9, imageUrl: "", category: "vegetables" },
 ];
 
 const FALLBACK_ORDERS = [
@@ -165,6 +166,8 @@ export default function CustomerDashboard() {
   const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
+  const getItemImage = (item) => item.imageUrl || CATEGORIES.find((category) => category.key === item.category)?.image || CATEGORIES[0].image;
+
   const handlePlaceOrder = async () => {
     if (cart.length === 0) {
       setError("Add items to your kart before placing an order.");
@@ -261,11 +264,7 @@ export default function CustomerDashboard() {
                     {items.map((item) => (
                       <div className="item-card" key={item.id}>
                         <div className="item-card__thumb">
-                          {item.imageUrl ? (
-                            <img src={item.imageUrl} alt={item.name} />
-                          ) : (
-                            <span className="item-card__emoji">🍅</span>
-                          )}
+                          <img src={getItemImage(item)} alt={item.name} />
                         </div>
                         <div className="item-card__name">{item.name}</div>
                         <div className="item-card__stock">{item.stock} available</div>
